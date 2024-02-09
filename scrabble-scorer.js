@@ -12,6 +12,7 @@ const oldPointStructure = {
    10: ['Q', 'Z']
 };
 
+
 function oldScrabbleScorer(word) {
    word = word.toUpperCase();
    let letterPoints = "";
@@ -56,44 +57,61 @@ let vowelBonusScorer = (word) => {
    return score;
 };
 
-let scrabbleScorer;
+let scrabbleScorer = (word) => {
+   let score = 0;
+   let letterArrayLowerCase = word.toLowerCase().split('');
+   letterArrayLowerCase.map((el) => {
+      score += newPointStructure[el];      
+   })
+   return score;
+};
 
-const scoringAlgorithms = [
+const scorerAlgorithms = [
    {
       name: 'Simple Score',
       description: 'Each letter is worth 1 point.',
-      scoringFunction: simpleScorer
+      scorerFunction: simpleScorer
    },
 
    {
       name: 'Bonus Vowels',
       description: 'A function that returns a score based on the number of vowels and consonants.',
-      scoringFunction: vowelBonusScorer
+      scorerFunction: vowelBonusScorer
    },
 
    {
       name: 'Scrabble',
-      description: 'Uses the oldScrabbleScorer() function to determine the score for a given word.',
-      scoringFunction: oldScrabbleScorer
+      description: 'Uses the scrabbleScorer() function to determine the score for a given word.',
+      scorerFunction: scrabbleScorer
    }
 ];
 
-function printAlgorithmNameAndDescription(num){
-   return `${scoringAlgorithms[num].name}: ${scoringAlgorithms[num].description}`
+function printAlgorithmNameAndDescription(num) {
+   return `${scorerAlgorithms[num].name}: ${scorerAlgorithms[num].description}`
 }
 
-function scorerPrompt(word) { 
+function scorerPrompt(word) {
    let scoringChoice = Number(input.question(`\nWhich scoring algorithm would you like to use? \n\n 0 - ${printAlgorithmNameAndDescription(0)}  \n 1 - ${printAlgorithmNameAndDescription(1)} \n 2 - ${printAlgorithmNameAndDescription(2)}\n\n Enter 0, 1, or 2: `));
-   let score = `Score for '${word}': ${scoringAlgorithms[scoringChoice].scoringFunction(word)}`;
+   let score = `\n Score for '${word}': ${scorerAlgorithms[scoringChoice].scorerFunction(word)}`;
    return score;
 };
 
-function transform() { };
+function transform(pointStructure) {
+   let newPointStructure = {};
 
-let newPointStructure;
+   for(key in pointStructure){
+      pointStructure[key].map((el) => {
+         newPointStructure[el.toLowerCase()] = Number(key); 
+      })
+   }
+   
+   return newPointStructure;
+};
+
+let newPointStructure = transform(oldPointStructure);
 
 function runProgram() {
-   let word = initialPrompt(); 
+   let word = initialPrompt();
    console.log(scorerPrompt(word));
 }
 
@@ -106,7 +124,7 @@ module.exports = {
    simpleScorer: simpleScorer,
    vowelBonusScorer: vowelBonusScorer,
    scrabbleScorer: scrabbleScorer,
-   scoringAlgorithms: scoringAlgorithms,
+   scoringAlgorithms: scorerAlgorithms,
    newPointStructure: newPointStructure,
    runProgram: runProgram,
    scorerPrompt: scorerPrompt
